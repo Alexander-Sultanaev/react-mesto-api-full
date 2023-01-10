@@ -1,0 +1,17 @@
+.popup__field {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  border: none;
+  max-height: 190px;
+}
+
+@media screen and (min-width: 319px) and (max-width: 690px){
+  .popup__field::after{
+    bottom: 91px;
+  }
+  .popup__field::before{
+    bottom: 151px;
+  }
+}

@@ -1,0 +1,8 @@
+.gallery__heart-count {
+  display: block;
+  text-align: center;
+  line-height: 16px;
+  font-size: 13px;
+  font-weight: 400;
+  padding-top: 3px;
+}
