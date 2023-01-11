@@ -8,9 +8,6 @@ const Main = (props) => {
 const currentUser = useContext(CurrentUserContext)
 const {name, about, avatar} = currentUser;
 
-
-
-
   return (
     <>
     <main className="main">

@@ -1,0 +1,15 @@
+.header__nav {
+  display: flex;
+  margin: 6px 0 0 0;
+  font-size: 18px;
+  line-height: 22px;
+  text-align: center;
+}
+
+@media screen and (min-width: 319px) and (max-width: 400px){
+  .header__nav{
+    flex-direction: column;
+    max-width: 200px;
+  }
+}
+
