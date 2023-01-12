@@ -1,8 +1,7 @@
-export const BASE_URL = 'https://auth.nomoreparties.co';
+export const BASE_URL = 'http://api.dbmesto.nomoredomains.club';
 
 const checkResponse = (res) => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.statusText}`)
 const headers = {
-  'Accept': 'application/json',
   'Content-Type': 'application/json',
 };
 export const register = ({ email, password }) => {

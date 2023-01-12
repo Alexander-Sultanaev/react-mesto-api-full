@@ -13,7 +13,10 @@ class Api {
 
   getInitialCards() {
     return fetch(`${this._url}/cards`, {
-      headers: this._headers
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        'content-type': 'application/json'
+      },
     })
     .then(res => this._checkResponse(res))
   }
@@ -21,7 +24,10 @@ class Api {
   addCar(data){
     return fetch(`${this._url}/cards`, {
       method: 'POST',
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        'content-type': 'application/json'
+      },
       body: JSON.stringify({
         name: data.name,
         link: data.link
@@ -33,7 +39,10 @@ class Api {
   deleteCard(cardId) {
     return fetch(`${this._url}/cards/${cardId}`,{
       method: 'DELETE',
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        'content-type': 'application/json'
+      },
     })
     .then(res => this._checkResponse(res))
   }
@@ -41,14 +50,20 @@ class Api {
   changeLikeCardStatus(cardId, isLiked) {
     return fetch(`${this._url}/cards/${cardId}/likes`,{
       method: `${!isLiked ? 'DELETE' : 'PUT'}`,
-      headers: this._headers
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        'content-type': 'application/json'
+      }
     })
     .then(res => this._checkResponse(res))
   }
 
   getUserInfo(){
     return fetch(`${this._url}/users/me`, {
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        'content-type': 'application/json'
+      },
       method: 'GET'
     })
     .then(res => this._checkResponse(res))
@@ -57,7 +72,10 @@ class Api {
   setUserInfo(data){
     return fetch(`${this._url}/users/me`, {
       method: 'PATCH',
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        'content-type': 'application/json'
+      },
       body: JSON.stringify({
         name: data.name,
         about: data.about
@@ -69,7 +87,10 @@ class Api {
   editUserAvatar(data){
     return fetch(`${this._url}/users/me/avatar`, {
       method: 'PATCH',
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        'content-type': 'application/json'
+      },
       body: JSON.stringify({
         avatar: data.avatar
       })
@@ -79,10 +100,10 @@ class Api {
 }
 
 const api = new Api({
-  url: 'https://mesto.nomoreparties.co/v1/cohort-50',
+  url: 'http://api.dbmesto.nomoredomains.club/',
   headers: {
-    authorization: '1ab05af1-5f6c-42a4-8598-6f7702cd2129',
-    'Content-type': 'application/json'
-  }
+    authorization: `Bearer ${localStorage.getItem('jwt')}`,
+    'content-type': 'application/json'
+  },
 });
 export default api;
