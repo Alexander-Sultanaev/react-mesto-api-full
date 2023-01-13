@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://api.dbmesto.nomoredomains.club';
+export const BASE_URL = 'https://api.dbmesto.nomoredomains.club';
 
 const checkResponse = (res) => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.statusText}`)
 const headers = {

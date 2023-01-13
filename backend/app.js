@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const { errors } = require('celebrate');
 const routes = require('./routes/index');
 const errorHandler = require('./errors/ErrorHandler');
+const handlerCORS = require('./middlewares/handlerCORS');
 
 const PORT = 3000;
 
@@ -18,6 +19,7 @@ const app = express();
 app.use(express.json());
 app.use(limiter);
 app.use(helmet());
+app.use(handlerCORS);
 app.use('/', routes);
 app.use(errors());
 app.use(errorHandler);
