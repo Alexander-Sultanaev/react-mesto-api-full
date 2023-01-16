@@ -2,10 +2,10 @@ import React, { useContext } from "react";
 import { CurrentUserContext } from "../context/CurrentUserContext";
 
 
-const Card = (props) =>{
+const Card = ({card, onCardClick, onCardLike, onCardDelete}) =>{
   const currentUser = useContext(CurrentUserContext)
-  const isOwn = props.card.owner._id === currentUser._id;
-  const isLiked = props.card.likes.some(i => i._id === currentUser._id);
+  const isOwn = card.owner._id === currentUser._id;
+  const isLiked = card.likes.some(i => i._id === currentUser._id);
 
   const cardDeleteButtonClassName = 
     `gallery__button-delete ${isOwn ? 'gallery__button-delete_visible' : ""}`;
@@ -13,21 +13,21 @@ const Card = (props) =>{
     `gallery__button-like ${isLiked ? 'gallery__button-like_active' : ""}`;
 
   function handleClick() {
-    props.onCardClick(props.card);
+    onCardClick(card);
   };
 
   function handleCardLike() {
-    props.onCardLike(props.card)
+    onCardLike(card)
   };
 
   function handleDeleteClick(){
-    props.onCardDelete(props.card)
+    onCardDelete(card)
   }
   
   return (
     <li className="gallery__card">
-      <img src={props.card.link}
-      alt={props.card.name} 
+      <img src={card.link}
+      alt={card.name} 
       onClick={handleClick} 
       className="gallery__image"
       />
@@ -36,13 +36,13 @@ const Card = (props) =>{
       onClick={handleDeleteClick}
       />
       <div className="gallery__wraper">
-        <h2 className="gallery__title">{props.card.name}</h2>
+        <h2 className="gallery__title">{card.name}</h2>
         <div className="gallery__container">
           <button type="button" 
           className={cardLikeButtonClassName} 
           onClick={handleCardLike}
           />
-          <span className="gallery__heart-count">{props.card.likes.length}</span>
+          <span className="gallery__heart-count">{card.likes.length}</span>
         </div>
       </div>
     </li>

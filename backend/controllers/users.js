@@ -6,6 +6,7 @@ const NotFoundError = require('../errors/NotFoundError');
 const IncorrectDataError = require('../errors/IncorrectDataError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 const ConflictError = require('../errors/ConflictError');
+const { privateKey } = require('../middlewares/auth');
 
 const getUsers = async (req, res, next) => {
   try {
@@ -97,7 +98,7 @@ const login = async (req, res, next) => {
     if (!matched) {
       return next(new UnauthorizedError('Ошибка 401. Переданы некорректные данные email или пароля'));
     }
-    const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+    const token = jwt.sign({ _id: user._id }, privateKey, { expiresIn: '7d' });
     return res.json({ token });
   } catch (err) {
     console.error(err);
