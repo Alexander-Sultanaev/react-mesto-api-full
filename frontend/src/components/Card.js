@@ -21,7 +21,7 @@ const Card = ({card, onCardClick, onCardLike, onCardDelete}) =>{
   };
 
   function handleDeleteClick(){
-    onCardDelete(card)
+    onCardDelete(card._id)
   }
   
   return (
@@ -41,6 +41,7 @@ const Card = ({card, onCardClick, onCardLike, onCardDelete}) =>{
           <button type="button" 
           className={cardLikeButtonClassName} 
           onClick={handleCardLike}
+          aria-label="Like"
           />
           <span className="gallery__heart-count">{card.likes.length}</span>
         </div>

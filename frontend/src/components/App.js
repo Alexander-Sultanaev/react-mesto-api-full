@@ -8,6 +8,7 @@ import ImagePopup from "./ImagePopup";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
+import PopupWithConfirmation from './PopupWithConfirmation';
 
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "./Login";
@@ -19,58 +20,82 @@ import * as auth from "../utils/auth.js";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [authorizationEmail, setAuthorizationEmail] = useState("");
+
   const [isRegistrationSuccessful, setIsRegistrationSuccessful] =
     useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
+
+  const [authorizationEmail, setAuthorizationEmail] = useState('');
+
+  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
-  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
+  const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = useState(false);
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
+
   const [selectedCard, setSelectedCard] = useState({});
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [removedCardId, setRemovedCardId] = useState('');
+
   const history = useHistory();
 
   useEffect(() => {
-    Promise.all([api.getUserInfo(), api.getInitialCards()])
-      .then(([userData, initialCards]) => {
-        setCurrentUser(userData);
-        setCards(initialCards);
-      })
-      .catch((err) => {
-        console.log(`Ошибка: ${err}`);
-      });
-  }, []);
+    handleTokenCheck()
+  }, [history])
 
-  const handleEditProfileClick = () => {
-    setIsEditProfilePopupOpen(true);
-  };
-  const handleAddPlaceClick = () => {
-    setIsAddPlacePopupOpen(true);
-  };
-  const handleEditAvatarClick = () => {
+  const openEditAvatarClick = () => {
     setIsEditAvatarPopupOpen(true);
   };
-  const handleInfoTooltip = () => {
+  const openEditProfileClick = () => {
+    setIsEditProfilePopupOpen(true);
+  };
+  const openAddPlaceClick = () => {
+    setIsAddPlacePopupOpen(true);
+  };
+  const openInfoTooltip = () => {
     setIsInfoTooltipOpen(true);
   };
+
   const handleCardClick = (card) => {
     setSelectedCard(card);
   };
 
-  const closeAllPopups = () => {
-    setIsEditProfilePopupOpen(false);
-    setIsAddPlacePopupOpen(false);
-    setIsEditAvatarPopupOpen(false);
-    setIsInfoTooltipOpen(false);
-    setSelectedCard({});
+  function handleCardLike(card) {
+    const jwt = localStorage.getItem('jwt');
+    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    api.changeLikeCardStatus(card._id, !isLiked, jwt)
+      .then((newCard) => {
+        setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
+      })
+      .catch((err) => {
+        console.log(`Ошибка: ${err}`);
+      });
+  }
+
+  const handleCardDeleteClick = (cardId) => {
+    setIsConfirmationPopupOpen(!isConfirmationPopupOpen);
+    setRemovedCardId(cardId);
   };
+
+  function handleCardDelete(cardId) {
+    const jwt = localStorage.getItem('jwt');
+    api
+      .deleteCard(cardId, jwt)
+      .then(() => {
+        setCards((cards) => cards.filter((card) => card._id !== cardId));
+        closeAllPopups();
+      })
+      .catch((err) => {
+        console.log(`Ошибка: ${err}`);
+      });
+  }
 
   const handleUpdateUser = (newUserInfo) => {
     setIsLoading(true);
+    const jwt = localStorage.getItem('jwt');
     api
-      .setUserInfo(newUserInfo)
+      .setUserInfo(newUserInfo, jwt)
       .then((data) => {
         setCurrentUser(data);
         closeAllPopups();
@@ -83,10 +108,11 @@ function App() {
       });
   };
 
-  const handleUpdateAvatar = (data) => {
+  const handleUpdateAvatar = (newData) => {
     setIsLoading(true);
+    const jwt = localStorage.getItem('jwt');
     api
-      .editUserAvatar(data)
+      .setUserAvatar(newData, jwt)
       .then((data) => {
         setCurrentUser(data);
         closeAllPopups();
@@ -99,35 +125,11 @@ function App() {
       });
   };
 
-  function handleCardLike(card) {
-    const isLiked = card.likes.some((i) => i._id === currentUser._id);
-    api
-      .changeLikeCardStatus(card._id, !isLiked)
-      .then((newCard) => {
-        setCards((state) =>
-          state.map((c) => (c._id === card._id ? newCard : c))
-        );
-      })
-      .catch((err) => {
-        console.log(`Ошибка: ${err}`);
-      });
-  }
-
-  function handleCardDelete(card) {
-    api
-      .deleteCard(card._id)
-      .then(() => {
-        setCards((state) => state.filter((c) => c._id !== card._id));
-      })
-      .catch((err) => {
-        console.log(`Ошибка: ${err}`);
-      });
-  }
-
-  function handleAddPlaceSubmit(data) {
+  const handleAddPlaceSubmit = ({name, link}) => {
     setIsLoading(true);
+    const jwt = localStorage.getItem('jwt');
     api
-      .addCar(data)
+      .addCard({name: name, link: link}, jwt)
       .then((newCard) => {
         setCards([newCard, ...cards]);
         closeAllPopups();
@@ -138,71 +140,86 @@ function App() {
       .finally(() => {
         setIsLoading(false);
       });
-  }
-  //пр-12
+  };
+
+  const closeAllPopups = () => {
+    setIsEditAvatarPopupOpen(false);
+    setIsEditProfilePopupOpen(false);
+    setIsAddPlacePopupOpen(false);
+    setIsConfirmationPopupOpen(false);
+    setIsInfoTooltipOpen(false);
+    setSelectedCard({});
+  };
+
+  // Регистрация и Авторизация профиля
   const handleRegistration = (data) => {
     return auth
       .register(data)
-      .then((data) => {
+      .then(() => {
         setIsRegistrationSuccessful(true);
-        handleInfoTooltip()
-        setAuthorizationEmail(data.data.email);
-        history.push("/sign-in");
+        openInfoTooltip();
+        history.push('/sign-in');
       })
       .catch((err) => {
         console.log(err);
         setIsRegistrationSuccessful(false);
-        handleInfoTooltip();
+        openInfoTooltip();
       });
   };
 
   const handleAuthorization = (data) => {
-    return auth.authorize(data)
-      .then((res) => {
+    return auth
+      .authorize(data)
+      .then((data) => {
         setIsLoggedIn(true);
-        setAuthorizationEmail(data.email);
-        localStorage.setItem("jwt", res.token);
-        history.push("/");
+        localStorage.setItem('jwt', data.token);
+        handleTokenCheck();
+        history.push('/');
       })
       .catch((err) => {
         console.log(err);
-        handleInfoTooltip();
+        openInfoTooltip();
       });
   };
 
   // Выход
   const handleSignOut = () => {
+    localStorage.removeItem('jwt');
+    history.push('/sign-in');
     setIsLoggedIn(false);
-    setAuthorizationEmail('')
-    localStorage.removeItem("jwt");
-    history.push("/sign-in");
+    setCurrentUser({});
+    setAuthorizationEmail('');
   };
 
   // Проверка токена
-  const tokenCheck = () => {
-    const jwt = localStorage.getItem("jwt");
+  const handleTokenCheck = () => {
+    const jwt = localStorage.getItem('jwt');
     if (!jwt) {
       return;
     }
     auth
       .getContent(jwt)
       .then((data) => {
-        setAuthorizationEmail(data.data.email);
+        setAuthorizationEmail(data.email);
+        setCurrentUser(data)
         setIsLoggedIn(true);
-        history.push("/");
+        history.push('/');
+      })
+      .catch((err) => console.log(err));
+    api
+      .getInitialCards(jwt)
+      .then((initialCards) => {
+        setCards(initialCards)
       })
       .catch((err) => console.log(err));
   };
 
   useEffect(() => {
-    tokenCheck();
-  }, []);
-
-  useEffect(() => {
     if (isLoggedIn) {
-      history.push("/");
+      history.push('/');
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, history]);
+
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -224,13 +241,13 @@ function App() {
             path="/"
             component={Main}
             loggedIn={isLoggedIn}
-            onEditProfile={handleEditProfileClick}
-            onAddPlace={handleAddPlaceClick}
-            onEditAvatar={handleEditAvatarClick}
+            onEditProfile={openEditProfileClick}
+            onAddPlace={openAddPlaceClick}
+            onEditAvatar={openEditAvatarClick}
             onCardClick={handleCardClick}
             cards={cards}
             onCardLike={handleCardLike}
-            onCardDelete={handleCardDelete}
+            onCardDelete={handleCardDeleteClick}
           />
         </Switch>
         <Footer />
@@ -251,6 +268,13 @@ function App() {
           onClose={closeAllPopups}
           onAddPlace={handleAddPlaceSubmit}
           onLoading={isLoading}
+        />
+          <PopupWithConfirmation
+          isOpen={isConfirmationPopupOpen}
+          onClose={closeAllPopups}
+          onLoading={isLoading}
+          onSubmit={handleCardDelete}
+          card={removedCardId}
         />
         <InfoTooltip
           onClose={closeAllPopups}

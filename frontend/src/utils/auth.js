@@ -1,34 +1,35 @@
-export const BASE_URL = 'https://api.dbmesto.nomoredomains.club';
+import { checkResponse, baseUrl } from './utils';
 
-const checkResponse = (res) => res.ok ? res.json() : Promise.reject(`Ошибка: ${res.statusText}`)
 const headers = {
+  Accept: 'application/json',
   'Content-Type': 'application/json',
 };
+
 export const register = ({ email, password }) => {
-  return fetch(`${BASE_URL}/signup`, {
+  return fetch(`${baseUrl}/signup`, {
     method: 'POST',
+    credentials: 'include',
     headers,
     body: JSON.stringify({ email, password }),
-  })
-  .then(checkResponse)
+  }).then((res) => checkResponse(res));
 };
 
 export const authorize = ({ email, password }) => {
-  return fetch (`${BASE_URL}/signin`, {
+  return fetch(`${baseUrl}/signin`, {
     method: 'POST',
+    credentials: 'include',
     headers,
-    body: JSON.stringify({ email, password })
-  })
-  .then(checkResponse)
+    body: JSON.stringify({ email, password }),
+  }).then((res) => checkResponse(res));
 };
 
 export const getContent = (token) => {
-  return fetch (`${BASE_URL}/users/me`, {
+  return fetch(`${baseUrl}/users/me`, {
     method: 'GET',
+    credentials: 'include',
     headers: {
       ...headers,
-      Authorization: `Bearer ${token}`
+      authorization: `Bearer ${token}`,
     },
-  })
-  .then(checkResponse)
+  }).then((res) => checkResponse(res));
 };
