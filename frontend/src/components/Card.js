@@ -4,7 +4,7 @@ import { CurrentUserContext } from "../context/CurrentUserContext";
 
 const Card = ({card, onCardClick, onCardLike, onCardDelete}) =>{
   const currentUser = useContext(CurrentUserContext)
-  const isOwn = card.owner._id === currentUser._id;
+  const isOwn = card.owner._id === currentUser._id; 
   const isLiked = card.likes.some(i => i._id === currentUser._id);
 
   const cardDeleteButtonClassName = 
@@ -25,20 +25,23 @@ const Card = ({card, onCardClick, onCardLike, onCardDelete}) =>{
   }
   
   return (
-    <li className="gallery__card">
-      <img src={card.link}
+    <div className="gallery__card">
+      <img 
+      src={card.link}
       alt={card.name} 
       onClick={handleClick} 
       className="gallery__image"
       />
-      <button type="button" 
+      <button 
+      type="button" 
       className={cardDeleteButtonClassName}
       onClick={handleDeleteClick}
       />
       <div className="gallery__wraper">
         <h2 className="gallery__title">{card.name}</h2>
         <div className="gallery__container">
-          <button type="button" 
+          <button 
+          type="button" 
           className={cardLikeButtonClassName} 
           onClick={handleCardLike}
           aria-label="Like"
@@ -46,7 +49,7 @@ const Card = ({card, onCardClick, onCardLike, onCardDelete}) =>{
           <span className="gallery__heart-count">{card.likes.length}</span>
         </div>
       </div>
-    </li>
+    </div>
   )
 }
 
