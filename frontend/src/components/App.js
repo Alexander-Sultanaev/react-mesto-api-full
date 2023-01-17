@@ -237,10 +237,9 @@ function App() {
             <Register onRegister={handleRegistration} />
           </Route>
           <ProtectedRoute
-            exact
-            path="/"
-            component={Main}
+            exact path="/"
             loggedIn={isLoggedIn}
+            component={Main}
             onEditProfile={openEditProfileClick}
             onAddPlace={openAddPlaceClick}
             onEditAvatar={openEditAvatarClick}
@@ -281,7 +280,10 @@ function App() {
           isOpen={isInfoTooltipOpen}
           isSuccess={isRegistrationSuccessful}
         />
-        <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+        <ImagePopup 
+        card={selectedCard} 
+        onClose={closeAllPopups} 
+        />
       </div>
     </CurrentUserContext.Provider>
   );
