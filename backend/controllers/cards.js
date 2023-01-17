@@ -14,9 +14,12 @@ const getCards = async (req, res, next) => {
 };
 const createCard = async (req, res, next) => {
   try {
-    const { name, link } = req.body;
-    const card = await Card.create({ name, link, owner: req.user._id });
-    return res.json(card);
+    const {
+      createdAt, likes, link, name, _id, owner,
+    } = await Card.create({ name: req.body.name, link: req.body.link, owner: req.user._id });
+    return res.json({
+      createdAt, likes, link, name, _id, owner: { _id: owner },
+    });
   } catch (err) {
     console.error(err);
     if (err.name === 'ValidationError' || err.name === 'CastError') {
@@ -46,16 +49,14 @@ const deleteCard = async (req, res, next) => {
 };
 const likeCard = async (req, res, next) => {
   try {
-    const { cardId } = req.params;
-    const card = await Card.findById(cardId);
+    const card = await Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $addToSet: { likes: req.user._id } },
+      { new: true },
+    ).populate(['owner', 'likes']);
     if (card === null) {
       return next(new NotFoundError('Ошибка 404. Карточка не найдена'));
     }
-    await Card.findByIdAndUpdate(
-      cardId,
-      { $addToSet: { likes: req.user._id } },
-      { new: true },
-    );
     return res.json({ message: 'Лайк успешно отправлен' });
   } catch (err) {
     if (err.name === 'CastError') {
@@ -66,16 +67,14 @@ const likeCard = async (req, res, next) => {
 };
 const dislikeCard = async (req, res, next) => {
   try {
-    const { cardId } = req.params;
-    const card = await Card.findById(cardId);
+    const card = await Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $pull: { likes: req.user._id } },
+      { new: true },
+    ).populate(['owner', 'likes']);
     if (card === null) {
       return next(new NotFoundError('Ошибка 404. Карточка не найдена'));
     }
-    await Card.findByIdAndUpdate(
-      cardId,
-      { $pull: { likes: req.user._id } },
-      { new: true },
-    );
     return res.json({ message: 'Лайк успешно удален' });
   } catch (err) {
     return next(err);
