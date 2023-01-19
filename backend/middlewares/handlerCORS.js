@@ -1,6 +1,4 @@
 const allowedCors = [
-  'http://localhost:3001',
-  'https://localhost:3001',
   'http://dbmesto.students.nomoredomains.club',
   'https://dbmesto.students.nomoredomains.club',
 ];
