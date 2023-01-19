@@ -7,6 +7,11 @@ const userRoutes = require('./users');
 const NotFoundError = require('../errors/NotFoundError');
 
 const regexUrl = (/(http|https):\/\/(www\.)?[0-9a-zA-Z-]+\.[a-zA-Z]+([0-9a-zA-Z-._~:/?#[\]@!$&'()*+,;=]+)/);
+routes.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 routes.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
