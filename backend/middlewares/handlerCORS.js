@@ -1,6 +1,6 @@
 const allowedCors = [
-  'http://dbmesto.students.nomoredomains.club',
-  'https://dbmesto.students.nomoredomains.club',
+  'http://dbmesto.nomoredomains.club',
+  'https://dbmesto.nomoredomains.club',
 ];
 
 const handlerCORS = (req, res, next) => {
