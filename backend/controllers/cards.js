@@ -47,16 +47,14 @@ const deleteCard = async (req, res, next) => {
     return next(err);
   }
 };
+// Возникает ошибка при поставке лайка(я уже все перепробовал)помоги пожалуйста!)
 const likeCard = async (req, res, next) => {
   try {
-    const card = await Card.findByIdAndUpdate(
+    await Card.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } },
       { new: true },
-    ).populate(['owner', 'likes']);
-    if (card === null) {
-      return next(new NotFoundError('Ошибка 404. Карточка не найдена'));
-    }
+    ).populate(['owner', 'likes']).orFail(() => new NotFoundError('Ошибка 404. Карточка не найдена'));
     return res.json({ message: 'Лайк успешно отправлен' });
   } catch (err) {
     if (err.name === 'CastError') {
@@ -67,14 +65,11 @@ const likeCard = async (req, res, next) => {
 };
 const dislikeCard = async (req, res, next) => {
   try {
-    const card = await Card.findByIdAndUpdate(
+    await Card.findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } },
       { new: true },
-    ).populate(['owner', 'likes']);
-    if (card === null) {
-      return next(new NotFoundError('Ошибка 404. Карточка не найдена'));
-    }
+    ).populate(['owner', 'likes']).orFail(() => new NotFoundError('Ошибка 404. Карточка не найдена'));
     return res.json({ message: 'Лайк успешно удален' });
   } catch (err) {
     return next(err);
