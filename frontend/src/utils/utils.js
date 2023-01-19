@@ -6,4 +6,4 @@ export const checkResponse = (response) => {
       );
 };
 
-export const baseUrl = 'https://api.dbmesto.students.nomoredomains.club';
+export const baseUrl = 'https://api.dbmesto.nomoredomains.club';
